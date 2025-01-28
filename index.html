@@ -1,150 +1,428 @@
 <!-- *****************************************************************************
-Problem Statement :Whack a penguin Game.
-Description :Whack a penguin is a game, which will be played by a single user.
-Whenever user click on image it should pop – up a penguin. If the penguin
-image is yeti, then user should get a message “ROARRRRRR” along with the
-yeti image.
-Developer:Md Nabeel Tayyab
-Date:23-7-18
-Company:WSA 
+Problem Statement: Penguin Memory Game
+Description: A multi-level memory game where players need to remember penguin locations.
+Level 1: Find matching pairs of penguins
+Level 2: Find triplets of penguins with yeti obstacles
+Level 3: Find variable-sized groups of penguins
 -->
 <!DOCTYPE html>
 <html>
-<head>
-<meta name="viewport" content="width=device-width, intial-scale=1.0"/>
-	<title>Whack a pengiun game</title>
-	<style>
-        /* Adding Background to body*/
-	body{
-		background-color: lightblue;
-         }
-		 
-		 
-/*	setting attributes for a div  with default image*/
-		article>div{
-			position: relative;
-			margin-left: 2;
-            display: block;
-            float:left; 
-            width:33%;
-			height: 200px;
-			background-image:  url("images/mound.png");
-			background-repeat: no-repeat;
-			transition: all .6s ease !important;
-		}
-        
-        /*Change the source of image when hovered on div */
-		article>div:hover{
-		background-image:  url("images/mound_hover.png");
-		}
-        /* adding padding to the body to make the article to center*/
-		body{
-			padding: 0% 5% 5% 15%;
-		}
-        
-    /* Animation of the image when its over*/
-        .animate{
-            position: relative;
-            animation: scaleupNdown 2s infinite;
+  <head>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>CYGAAR</title>
+    <style>
+      body {
+        background-color: lightblue;
+        padding: 0% 5% 5% 15%;
+      }
+
+      article > div {
+        position: relative;
+        margin: 5px;
+        display: block;
+        float: left;
+        width: 150px;
+        height: 150px;
+        background-image: url("images/mound.png");
+        background-repeat: no-repeat;
+        background-size: contain;
+        cursor: pointer;
+        transition: all 0.3s ease !important;
+      }
+
+      article > div:hover {
+        transform: scale(1.1);
+        background-image: url("images/mound_hover.png");
+      }
+
+      .game-info {
+        text-align: center;
+        margin: 20px;
+        padding: 10px;
+        background: rgba(255, 255, 255, 0.8);
+        border-radius: 10px;
+      }
+
+      .animate {
+        position: relative;
+        animation: scaleupNdown 2s infinite;
+      }
+
+      @keyframes scaleupNdown {
+        0% {
+          transform: scale(0.8);
         }
-        @keyframes scaleupNdown{
-            0%{
-               transform:  scale(.8);
-            }
-            50%{
-                  transform:  scale(1.5);                  
-            }
-            100%{
-                     transform:  scale(.8);
-            }
+        50% {
+          transform: scale(1.5);
         }
-		
-				 @media only screen and (max-width: 600px) {
-	article>div{
-        width:100%;
-		position: relative;
-	     float:none; 
-		
-    }
-}
-	</style>
-</head>
+        100% {
+          transform: scale(0.8);
+        }
+      }
 
-<body>
-<article id="article">
-        <h1 style="margin-left: 38%;">Welcome!!</h1>
-        <h2 style="margin-left: 35%;">Find The Penguin</h2>
-<!--Declaring all the div with onclick attributes sending it to the function changeimage-->
-	<div onclick="changeimage(this);"></div>
-		<div onclick="changeimage(this);"></div>
-			<div onclick="changeimage(this);"></div>
-				<div onclick="changeimage(this);"></div>
-					<div onclick="changeimage(this);"></div>
-						<div onclick="changeimage(this);"></div>
-							<div onclick="changeimage(this);"></div>
-								<div onclick="changeimage(this);"></div>
-									<div onclick="changeimage(this);"></div>
+      .revealed {
+        opacity: 1 !important;
+      }
 
+      .matched {
+        opacity: 0.5;
+        pointer-events: none;
+      }
 
+      #game-container {
+        max-width: 800px;
+        margin: 0 auto;
+      }
 
-</article>
-<!--hiding this particular part of div so that later it can be shown  when the penguin is hit-->
-	<div id="rest" style=" position: absolute; display: none; width: 100%; height: 100%; background: lightblue !important; z-index: 3; ">
-	    <img class="animate" style="margin-left: 25%; margin-top: 15%;" src="images/penguin8.png">
-	    <h1  style="color: crimson;margin-left: 25%;">ROARRRRRR.!!</h1>
-	    	    <button style="width: 80px; height: 80px; border-radius:50%; position: relative; bottom: -15%;margin-left: 28%; background-color: white; color: gray;"  onclick="location.reload();">Restart</button>	
-	</div>	
-	
+      button {
+        padding: 10px 20px;
+        font-size: 16px;
+        border-radius: 5px;
+        background: #4caf50;
+        color: white;
+        border: none;
+        cursor: pointer;
+        margin: 10px;
+      }
 
-													
-</body>
+      button:hover {
+        background: #45a049;
+      }
 
-<script type="text/javascript">
-    //simple array to store all the given random numbers
-var indexArray=[];
-    //getting random number using math.random function
-            function getrandom(){
-                return Math.floor((Math.random() * 9));
-                }
-    //checking if the random num is  repeated
-    function checkrandom(number){
-        var flag=false;
-    //search all the elements of array whether the given random number is existing
-        for(x in indexArray){
-            if(indexArray[x]==number){
-                flag=true;
+      @media only screen and (max-width: 600px) {
+        article > div {
+          width: calc(33% - 10px);
+          height: 100px;
+        }
+      }
+    </style>
+  </head>
+
+  <body>
+    <div class="game-info">
+      <h1>CYGAAR</h1>
+      <div id="level-info">Level: <span id="current-level">1</span></div>
+      <div id="clicks-info">Clicks: <span id="click-count">0</span></div>
+      <div id="instructions"></div>
+    </div>
+
+    <div id="game-container">
+      <article id="game-grid"></article>
+    </div>
+
+    <!-- Updated celebration modal -->
+    <div
+      id="celebration-modal"
+      style="
+        position: fixed;
+        display: none;
+        top: 50%;
+        left: 50%;
+        transform: translate(-50%, -50%);
+        background: rgba(255, 255, 255, 0.95);
+        padding: 20px;
+        border-radius: 15px;
+        box-shadow: 0 0 20px rgba(0, 0, 0, 0.2);
+        text-align: center;
+        z-index: 1000;
+      "
+    >
+      <img
+        id="celebration-penguin"
+        style="width: 150px; margin-bottom: 15px"
+        src="images/penguin9.png"
+      />
+      <h2 style="color: #2196f3; margin: 10px 0">Level Complete!</h2>
+      <p style="font-size: 1.2em; margin: 10px 0">
+        Clicks used: <span id="celebration-clicks">0</span>
+      </p>
+      <button
+        onclick="nextLevel()"
+        style="
+          background: #4caf50;
+          color: white;
+          border: none;
+          padding: 10px 20px;
+          border-radius: 5px;
+          cursor: pointer;
+          font-size: 1.1em;
+          margin-top: 10px;
+        "
+      >
+        Continue to Next Level
+      </button>
+    </div>
+
+    <!-- Updated yeti modal -->
+    <div
+      id="rest"
+      style="
+        position: fixed;
+        display: none;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background: rgba(173, 216, 230, 0.9);
+        z-index: 1000;
+        text-align: center;
+      "
+    >
+      <img
+        class="animate"
+        style="margin-top: 15%; max-width: 200px"
+        src="images/penguin8.png"
+      />
+      <h1 style="color: crimson">ROARRRRRR!!</h1>
+      <button onclick="continueGame()">Continue Playing</button>
+    </div>
+
+    <script>
+      let gameState = {
+        level: 1,
+        clicks: 0,
+        selectedTiles: [],
+        matchesNeeded: 0,
+        matchesFound: 0,
+        grid: [],
+        currentPattern: [],
+      };
+
+      const LEVEL_CONFIG = {
+        1: {
+          gridSize: 16,
+          groupSize: 2,
+          totalGroups: 8, // 8 pairs = 16 cards total
+          yetiCount: 0,
+          instructions:
+            "Find matching pairs of penguins. Click two tiles to reveal them. Matched pairs stay visible, unmatched pairs will hide again.",
+        },
+        2: {
+          gridSize: 24,
+          groupSize: 3,
+          totalGroups: 4,
+          yetiCount: 3,
+          instructions:
+            "Find triplets of matching penguins. Watch out for yetis!",
+        },
+        3: {
+          gridSize: 30,
+          groupSize: 3, // Same as level 2
+          totalGroups: 6,
+          yetiCount: 5,
+          instructions:
+            "Final Challenge: Find triplets of matching penguins. WARNING: Finding a yeti in this level will reset ALL your progress!",
+        },
+      };
+
+      function initializeGame() {
+        gameState.clicks = 0;
+        gameState.selectedTiles = [];
+        gameState.matchesFound = 0;
+        updateUI();
+        createGrid();
+      }
+
+      function createGrid() {
+        const config = LEVEL_CONFIG[gameState.level];
+        const gameGrid = document.getElementById("game-grid");
+        gameGrid.innerHTML = "";
+
+        // Create pattern based on level
+        gameState.currentPattern = generatePattern(config);
+
+        // Create grid
+        for (let i = 0; i < config.gridSize; i++) {
+          const tile = document.createElement("div");
+          tile.setAttribute("data-index", i);
+          tile.onclick = () => handleTileClick(i);
+          gameGrid.appendChild(tile);
+        }
+      }
+
+      function generatePattern(config) {
+        let pattern = [];
+        const penguinTypes = [0, 1, 2, 3, 4, 5, 6, 7, 9, 10];
+
+        if (gameState.level === 1) {
+          // Level 1: Exactly 8 pairs
+          const selectedPenguins = [...penguinTypes]
+            .sort(() => Math.random() - 0.5)
+            .slice(0, 8);
+          pattern = [...selectedPenguins, ...selectedPenguins];
+          return pattern.sort(() => Math.random() - 0.5);
+        } else {
+          // Levels 2 & 3: Triplets and yetis
+          const availablePenguins = penguinTypes.filter((p) => p !== 8);
+          const selectedPenguins = availablePenguins
+            .sort(() => Math.random() - 0.5)
+            .slice(0, config.totalGroups);
+
+          // Create triplets
+          selectedPenguins.forEach((penguin) => {
+            for (let i = 0; i < config.groupSize; i++) {
+              pattern.push(penguin);
             }
-        }   
-        return flag;
-    }
-    
-  //function to change Background image of div  
-    function changeimage(ele){
-        //get random number from getrandomfunction
-        var randomnumber=getrandom();
-        //check if given random number is already displayed
-        if(!checkrandom(randomnumber)){
-            //if the penguin is Whacked
-            if(randomnumber==8){
-                document.getElementById("article").style.display="none"; 
-                document.getElementById("rest").style.display="block"; 
-                //changing the background of given div
-                ele.style.backgroundImage=" url('images/penguin"+randomnumber+".png')";
-                return true;
-            }
-            
-            else{
-                ele.removeAttribute("onclick");
-                ele.style.backgroundImage=" url('images/penguin"+randomnumber+".png')";
-                //push the given random number to an array index so that its not repeated.
-                indexArray.push(randomnumber);
-        return true;
-               }
-            }
-        else{
-            //if random number is repeated then call this same function again 
-            changeimage(ele);
-            }
-    }
-</script>
+          });
+
+          // Add yetis
+          for (let i = 0; i < config.yetiCount; i++) {
+            pattern.push(8);
+          }
+
+          // Fill remaining spots with random penguins
+          while (pattern.length < config.gridSize) {
+            pattern.push(
+              availablePenguins[
+                Math.floor(Math.random() * availablePenguins.length)
+              ]
+            );
+          }
+
+          return pattern.sort(() => Math.random() - 0.5);
+        }
+      }
+
+      function handleTileClick(index) {
+        const tile = document.querySelector(`[data-index="${index}"]`);
+        if (
+          tile.classList.contains("revealed") ||
+          tile.classList.contains("matched") ||
+          gameState.selectedTiles.length >=
+            LEVEL_CONFIG[gameState.level].groupSize
+        ) {
+          return;
+        }
+
+        const penguinType = gameState.currentPattern[index];
+
+        // Handle yeti click
+        if (penguinType === 8) {
+          gameState.clicks++;
+          updateUI();
+          tile.style.backgroundImage = `url('images/penguin${penguinType}.png')`;
+          tile.classList.add("revealed");
+
+          if (gameState.level === 3) {
+            // Level 3: Reset progress on yeti encounter
+            setTimeout(() => {
+              showYeti();
+              // Reset all tiles
+              document.querySelectorAll("#game-grid div").forEach((tile) => {
+                tile.classList.remove("revealed", "matched");
+                tile.style.backgroundImage = 'url("images/mound.png")';
+              });
+              // Reset game state but keep click count
+              gameState.selectedTiles = [];
+              gameState.matchesFound = 0;
+            }, 500);
+          } else {
+            showYeti();
+            setTimeout(() => {
+              tile.classList.remove("revealed");
+              tile.style.backgroundImage = 'url("images/mound.png")';
+            }, 1000);
+          }
+          return;
+        }
+
+        gameState.clicks++;
+        updateUI();
+
+        tile.style.backgroundImage = `url('images/penguin${penguinType}.png')`;
+        tile.classList.add("revealed");
+
+        gameState.selectedTiles.push({ index, type: penguinType });
+
+        if (
+          gameState.selectedTiles.length ===
+          LEVEL_CONFIG[gameState.level].groupSize
+        ) {
+          setTimeout(() => checkForMatch(), 500);
+        }
+      }
+
+      function checkForMatch() {
+        const allMatch = gameState.selectedTiles.every(
+          (tile) => tile.type === gameState.selectedTiles[0].type
+        );
+
+        if (allMatch) {
+          gameState.selectedTiles.forEach((tile) => {
+            const element = document.querySelector(
+              `[data-index="${tile.index}"]`
+            );
+            element.classList.add("matched");
+          });
+          gameState.matchesFound++;
+          checkLevelComplete();
+        } else {
+          gameState.selectedTiles.forEach((tile) => {
+            const element = document.querySelector(
+              `[data-index="${tile.index}"]`
+            );
+            element.classList.remove("revealed");
+            element.style.backgroundImage = 'url("images/mound.png")';
+          });
+        }
+
+        gameState.selectedTiles = [];
+      }
+
+      function countGroupSize(penguinType) {
+        return gameState.currentPattern.filter((type) => type === penguinType)
+          .length;
+      }
+
+      function checkLevelComplete() {
+        const config = LEVEL_CONFIG[gameState.level];
+        const totalMatches = config.totalGroups;
+
+        if (gameState.matchesFound >= totalMatches) {
+          showCelebration();
+        }
+      }
+
+      function showCelebration() {
+        const modal = document.getElementById("celebration-modal");
+        document.getElementById("celebration-clicks").textContent =
+          gameState.clicks;
+        document.getElementById("celebration-penguin").src =
+          gameState.level === 3
+            ? "images/penguin10.png"
+            : "images/penguin9.png";
+        modal.style.display = "block";
+      }
+
+      function nextLevel() {
+        document.getElementById("celebration-modal").style.display = "none";
+        if (gameState.level < 3) {
+          gameState.level++;
+          initializeGame();
+        } else {
+          alert("Congratulations! You completed all levels!");
+          gameState.level = 1;
+          initializeGame();
+        }
+      }
+
+      function showYeti() {
+        document.getElementById("rest").style.display = "block";
+      }
+
+      function continueGame() {
+        document.getElementById("rest").style.display = "none";
+      }
+
+      function updateUI() {
+        document.getElementById("current-level").textContent = gameState.level;
+        document.getElementById("click-count").textContent = gameState.clicks;
+        document.getElementById("instructions").textContent =
+          LEVEL_CONFIG[gameState.level].instructions;
+      }
+
+      // Start the game
+      initializeGame();
+    </script>
+  </body>
 </html>
